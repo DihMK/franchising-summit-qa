@@ -8,6 +8,13 @@ export default function Moderador() {
   const [conectado, setConectado] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [stats, setStats] = useState(null);
+
+  function loadStats() {
+    fetch('/api/perguntas/stats')
+      .then(r => r.json())
+      .then(setStats);
+  }
 
   useEffect(() => {
     fetch('/api/perguntas')
@@ -365,6 +372,42 @@ export default function Moderador() {
         }
         @keyframes slideInRight { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:none} }
         @keyframes fadeOut { to{opacity:0;transform:translateX(8px)} }
+
+        /* Dashboard */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+        .stat-card { background: #0f1c35; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+        .stat-label { font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.8px; }
+        .stat-value { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+        .stat-card.blue  { border-color: rgba(59,130,246,0.25);  } .stat-card.blue  .stat-value { color: #60a5fa; }
+        .stat-card.amber { border-color: rgba(251,191,36,0.25);  } .stat-card.amber .stat-value { color: #fbbf24; }
+        .stat-card.green { border-color: rgba(74,222,128,0.25);  } .stat-card.green .stat-value { color: #4ade80; }
+        .stat-card.slate { border-color: rgba(148,163,184,0.12); } .stat-card.slate .stat-value { color: #94a3b8; }
+
+        .dash-section { margin-bottom: 28px; }
+        .dash-section-title { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+
+        .timeline { display: flex; flex-direction: column; gap: 8px; }
+        .tl-row { display: flex; align-items: center; gap: 12px; }
+        .tl-hora { font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.3); width: 44px; flex-shrink: 0; }
+        .tl-bar-wrap { flex: 1; background: rgba(255,255,255,0.04); border-radius: 6px; height: 22px; overflow: hidden; }
+        .tl-bar { height: 100%; background: linear-gradient(90deg, #1d4ed8, #3b82f6); border-radius: 6px; min-width: 4px; }
+        .tl-count { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.4); width: 20px; text-align: right; }
+
+        .all-list { display: flex; flex-direction: column; gap: 8px; }
+        .all-item { background: #0f1c35; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+        .all-item-nome { font-size: 0.75rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
+        .all-item-text { font-size: 0.88rem; color: #cbd5e1; line-height: 1.5; }
+        .all-item-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .all-item-hora { font-size: 0.68rem; color: rgba(255,255,255,0.2); white-space: nowrap; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-pendente { background: #64748b; } .dot-destaque { background: #fbbf24; } .dot-respondida { background: #4ade80; }
+
+        .dash-actions { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+        .btn-dash { display: flex; align-items: center; gap: 6px; border-radius: 8px; padding: 8px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; border: 1px solid; }
+        .btn-refresh { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+        .btn-refresh:hover { background: rgba(255,255,255,0.09); color: #fff; }
+        .btn-export { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: #60a5fa; }
+        .btn-export:hover { background: rgba(59,130,246,0.18); }
       `}</style>
 
       {/* Modal de confirmação */}
@@ -409,16 +452,82 @@ export default function Moderador() {
           { key: 'destaque',   icon: '⭐', label: 'Em destaque',  count: destaques.length },
           { key: 'respondida', icon: '✅', label: 'Respondidas',  count: respondidas.length },
           { key: 'todas',      icon: '📋', label: 'Todas',        count: perguntas.length },
+          { key: 'dashboard',  icon: '📊', label: 'Dashboard',     count: null },
         ].map(t => (
           <button key={t.key} className={`tab-btn ${tab === t.key ? 'active' : ''}`} onClick={() => setTab(t.key)}>
             {t.icon} {t.label}
-            <span className="tab-count">{t.count}</span>
+            {t.count !== null && <span className="tab-count">{t.count}</span>}
           </button>
         ))}
       </div>
 
       <div className="content">
-        {lista.length === 0 ? (
+
+        {/* ── Dashboard ── */}
+        {tab === 'dashboard' && (() => {
+          if (!stats) {
+            loadStats();
+            return <div className="empty"><div className="empty-icon">📊</div><p>Carregando dados...</p></div>;
+          }
+          const horas = Object.entries(stats.porHora).sort((a,b) => a[0].localeCompare(b[0]));
+          const maxH  = Math.max(...horas.map(h => h[1]), 1);
+          function exportCSV() {
+            const rows = [['ID','Nome','Pergunta','Status','Horário'], ...stats.todas.map(q => [q.id, q.nome, `"${q.pergunta.replace(/"/g,'""')}"`, q.status, new Date(q.created_at).toLocaleString('pt-BR')])];
+            const csv  = rows.map(r => r.join(',')).join('\n');
+            const a    = document.createElement('a');
+            a.href     = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            a.download = 'perguntas-summit.csv';
+            a.click();
+          }
+          return <>
+            <div className="dash-actions">
+              <button className="btn-dash btn-refresh" onClick={loadStats}>↻ Atualizar</button>
+              <button className="btn-dash btn-export"  onClick={exportCSV}>⬇ Exportar CSV</button>
+            </div>
+
+            <div className="dash-grid">
+              <div className="stat-card blue">  <span className="stat-label">Total</span>       <span className="stat-value">{stats.total}</span></div>
+              <div className="stat-card slate"> <span className="stat-label">Pendentes</span>   <span className="stat-value">{stats.pendentes}</span></div>
+              <div className="stat-card amber"> <span className="stat-label">Em destaque</span> <span className="stat-value">{stats.destaque}</span></div>
+              <div className="stat-card green"> <span className="stat-label">Respondidas</span> <span className="stat-value">{stats.respondidas}</span></div>
+            </div>
+
+            {horas.length > 0 && (
+              <div className="dash-section">
+                <div className="dash-section-title">Perguntas por horário</div>
+                <div className="timeline">
+                  {horas.map(([h, n]) => (
+                    <div key={h} className="tl-row">
+                      <span className="tl-hora">{h}</span>
+                      <div className="tl-bar-wrap"><div className="tl-bar" style={{width: `${(n/maxH)*100}%`}}/></div>
+                      <span className="tl-count">{n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="dash-section">
+              <div className="dash-section-title">Todas as perguntas ({stats.total})</div>
+              <div className="all-list">
+                {stats.todas.map(q => (
+                  <div key={q.id} className="all-item">
+                    <div>
+                      <div className="all-item-nome">👤 {q.nome}</div>
+                      <div className="all-item-text">{q.pergunta}</div>
+                    </div>
+                    <div className="all-item-meta">
+                      <span className="all-item-hora">{new Date(q.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span>
+                      <span className={`status-dot dot-${q.status}`} title={q.status}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>;
+        })()}
+
+        {tab !== 'dashboard' && lista.length === 0 ? (
           <div className="empty">
             <div className="empty-icon">{emptyMsg[tab][0]}</div>
             <p>{emptyMsg[tab][1]}</p>
