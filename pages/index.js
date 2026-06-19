@@ -66,14 +66,14 @@ export default function Audiencia() {
         .logo-wrap {
           background: white;
           border-radius: 14px;
-          padding: 10px 22px;
-          margin-bottom: 24px;
+          padding: 10px 24px;
+          margin: 0 auto 24px;
           box-shadow: 0 8px 40px rgba(0,0,0,0.35);
-          width: fit-content;
-          display: flex;
+          display: inline-flex;
           align-items: center;
+          align-self: center;
         }
-        .logo-wrap img { height: 36px; width: auto; display: block; }
+        .logo-wrap img { height: 34px; width: auto; display: block; }
 
         .event-name {
           font-size: clamp(1.15rem, 5vw, 1.5rem);
