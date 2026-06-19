@@ -63,15 +63,14 @@ export default function Audiencia() {
           pointer-events: none;
         }
 
+        .logo-center { text-align: center; width: 100%; margin-bottom: 24px; }
         .logo-wrap {
           background: white;
           border-radius: 14px;
           padding: 10px 24px;
-          margin: 0 auto 24px;
           box-shadow: 0 8px 40px rgba(0,0,0,0.35);
           display: inline-flex;
           align-items: center;
-          align-self: center;
         }
         .logo-wrap img { height: 34px; width: auto; display: block; }
 
@@ -215,8 +214,10 @@ export default function Audiencia() {
         }
       `}</style>
 
-      <div className="logo-wrap">
-        <img src="/logo-abf.jpg" alt="ABF" />
+      <div className="logo-center">
+        <div className="logo-wrap">
+          <img src="/logo-abf.jpg" alt="ABF" />
+        </div>
       </div>
 
       <p className="event-name">Franchising Summit Brasil</p>
