@@ -183,7 +183,7 @@ export default function Moderador() {
         .tab-btn.active .tab-count { background: rgba(59,130,246,0.25); color: #93c5fd; }
 
         /* Content */
-        .content { padding: 20px; max-width: 860px; }
+        .content { padding: 20px; width: 100%; }
 
         /* Empty */
         .empty { text-align: center; padding: 80px 20px; }
