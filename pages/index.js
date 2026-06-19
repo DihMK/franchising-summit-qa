@@ -258,7 +258,7 @@ export default function Audiencia() {
           <div className="success">
             <div className="success-ring">✓</div>
             <h3>Pergunta enviada!</h3>
-            <p>Sua pergunta foi recebida pelo moderador.<br />Fique atento durante a sessão de Q&A.</p>
+            <p>Sua pergunta foi recebida pelo moderador.</p>
             <button className="btn-nova" onClick={resetar}>+ Enviar outra pergunta</button>
           </div>
         )}
