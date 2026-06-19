@@ -65,15 +65,15 @@ export default function Audiencia() {
 
         .logo-wrap {
           background: white;
-          border-radius: 20px;
-          padding: 14px 32px;
+          border-radius: 14px;
+          padding: 10px 22px;
           margin-bottom: 24px;
-          box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 20px 60px rgba(0,0,0,0.35);
-          height: 70px;
+          box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+          width: fit-content;
           display: flex;
           align-items: center;
         }
-        .logo-wrap img { height: 40px; width: auto; display: block; }
+        .logo-wrap img { height: 36px; width: auto; display: block; }
 
         .event-name {
           font-size: clamp(1.15rem, 5vw, 1.5rem);
